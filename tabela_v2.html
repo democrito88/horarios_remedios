@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horário de remédios</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      #print-btn {
+        display: none;
+      }
+
+      /* Forçar bordas sólidas na impressão */
+      table, th, td {
+        border: 1px solid #000 !important;
+        border-collapse: collapse !important;
+      }
+      #print-area .border {
+        border: 1px solid #000 !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-6">
+
+    <!-- Formulário -->
+    <div class="bg-white shadow-lg rounded-lg w-full max-w-3xl p-6 mb-4">
+        <form action="">
+            <div>
+                <label for="de">De</label>
+                <input type="number" min="0" max="23" name="de" id="de" class="py-2 px-4 rounded">
+            </div>
+            <div>
+                <label for="ate">Até</label>
+                <input type="number" min="0" max="23" name="ate" id="ate" class="py-2 px-4 rounded">
+            </div>
+            <div>
+                <label for="intervalo">Intervalo entre horários</label>
+                <input type="number" min="1" max="23" name="intervalo" id="intervalo" class="py-2 px-4 rounded">
+            </div>
+            <div>
+                <label for="quantidade">Quantidade de remédios</label>
+                <input type="number" name="quantidade" id="quantidade" class="py-2 px-4 rounded">
+            </div>
+        </form>
+    </div>
+
+    <!-- Quadro a ser impresso -->
+    <div id="print-area" class="bg-white shadow-lg rounded-lg w-full max-w-3xl p-6">
+        <h1 class="text-2xl font-bold text-center mb-2 text-blue-600"> 💊 Horários de remédios</h1>
+        <small class="text-xs text-gray-500 ml-80 mt-3">nome do paciente</small>
+        <div class="border border-gray-400 h-8 w-80 m-auto mb-3"></div>
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border border-gray-400">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Botão de imprimir -->
+    <button id="print-btn" onclick="window.print()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        🖨️ Imprimir tabela
+    </button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => cabecalhoHorarios());
+    document.querySelector('#quantidade').addEventListener('input', () => {
+        let quantidade = document.querySelector('#quantidade').value;
+        document.querySelector('tbody').innerHTML = "";
+        for (let i = 0; i < quantidade; i++){
+            let linha = document.createElement('tr');
+            linha.classList.add('h-10');
+            for(let j = 0; j < 9; j++){
+                linha.innerHTML += `<td class="border border-gray-300 px-4 py-2"></td>`;
+            }
+            document.querySelector('tbody').appendChild(linha);
+        }
+    });
+    document.querySelector('#de').addEventListener('input', () => atualizarHorarios());
+    document.querySelector('#ate').addEventListener('input', () => atualizarHorarios());
+    document.querySelector('#intervalo').addEventListener('input', () => atualizarHorarios());
+
+    function cabecalhoHorarios(){
+        let de = parseInt(document.querySelector('#de').value ?? 7);
+        let ate = parseInt(document.querySelector('#ate').value ?? 23);
+        let intervalo = parseInt(document.querySelector('#intervalo').value ?? 2);
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<th class="border border-gray-300 px-4 py-2"></th>`;
+        for (let i = de; i < ate; i+=intervalo){
+            tr.innerHTML += `<th class="border border-gray-300 px-4 py-2 w-8">${i}:00</th>`;
+        }
+        document.querySelector('thead').appendChild(tr);
+    }
+    function gerarHorarios(de = 7, ate = 22, intervalo=2){
+        document.querySelector('thead').innerHTML = "";
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<th class="border border-gray-300 px-4 py-2"></th>`;
+        for (let i = de; i <= ate; i+=intervalo){
+            tr.innerHTML += `<th class="border border-gray-300 px-4 py-2 w-8">${i}:00</th>`;
+        }
+        document.querySelector('thead').appendChild(tr);
+    }
+    function atualizarHorarios(){
+        let de = parseInt(document.querySelector('#de').value);
+        let ate = parseInt(document.querySelector('#ate').value);
+        let intervalo = parseInt(document.querySelector('#intervalo').value);
+        gerarHorarios(de, ate, intervalo);
+    }
+</script>
+</body>
+</html>
